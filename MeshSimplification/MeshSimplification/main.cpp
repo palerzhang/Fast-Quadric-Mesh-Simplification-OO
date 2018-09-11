@@ -47,13 +47,13 @@ void load_obj(MeshSimplifier * ms, const char* filename, bool process_uv = false
 	int vertex_cnt = 0;
 	int material = -1;
 	std::map<std::string, int> material_map;
-	std::vector<vec3f> uvs;
+	std::vector<MsVec3f> uvs;
 	std::vector<std::vector<int> > uvMap;
 
 	while (fgets(line, 1000, fn) != NULL)
 	{
 		Vertex v;
-		vec3f uv;
+		MsVec3f uv;
 
 		if (strncmp(line, "mtllib", 6) == 0)
 		{
@@ -234,10 +234,10 @@ int main()
 	std::string s = "D:/download/bunny.obj";
 	//std::cin >> s;
 	MeshSimplifier * ms = new MeshSimplifier();
-	std::string outs = "D:/download/bunny_sim.obj";
+	std::string outs = "D:/download/bunny_sim3.obj";
 
 	load_obj(ms, s.c_str(), false);
 	//ms->simplify_mesh_lossless();
-	ms->simplify_mesh(600);
+	ms->SimplifyMesh(200);
 	write_obj(ms, outs.c_str());
 }

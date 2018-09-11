@@ -31,84 +31,84 @@ namespace MeshSimplifierSpace
 #define LOOP(_iter_, s, e) for (int _iter_ = s; _iter_ < e; _iter_++)
 
 	// vector3
-	struct vector3
+	struct MsVector3
 	{
 		double x, y, z;
 	};
 
 	// vec3f
-	struct vec3f
+	struct MsVec3f
 	{
 		double x, y, z;
 
-		inline vec3f(void) {}
+		inline MsVec3f(void) {}
 
-		inline vec3f(vector3 a)
+		inline MsVec3f(MsVector3 a)
 		{
 			x = a.x; y = a.y; z = a.z;
 		}
 
-		inline vec3f(const double X, const double Y, const double Z)
+		inline MsVec3f(const double X, const double Y, const double Z)
 		{
 			x = X; y = Y; z = Z;
 		}
 
-		inline vec3f operator + (const vec3f& a) const
+		inline MsVec3f operator + (const MsVec3f& a) const
 		{
-			return vec3f(x + a.x, y + a.y, z + a.z);
+			return MsVec3f(x + a.x, y + a.y, z + a.z);
 		}
 
-		inline vec3f operator += (const vec3f& a) const
+		inline MsVec3f operator += (const MsVec3f& a) const
 		{
-			return vec3f(x + a.x, y + a.y, z + a.z);
+			return MsVec3f(x + a.x, y + a.y, z + a.z);
 		}
 
-		inline vec3f operator * (const double a) const
+		inline MsVec3f operator * (const double a) const
 		{
-			return vec3f(x * a, y * a, z * a);
+			return MsVec3f(x * a, y * a, z * a);
 		}
 
-		inline vec3f operator * (const vec3f a) const
+		inline MsVec3f operator * (const MsVec3f a) const
 		{
-			return vec3f(x * a.x, y * a.y, z * a.z);
+			return MsVec3f(x * a.x, y * a.y, z * a.z);
 		}
 
-		inline vec3f v3() const
+		inline MsVec3f v3() const
 		{
-			return vec3f(x, y, z);
+			return MsVec3f(x, y, z);
 		}
 
-		inline vec3f operator = (const vector3 a)
-		{
-			x = a.x; y = a.y; z = a.z; return *this;
-		}
-
-		inline vec3f operator = (const vec3f a)
+		inline MsVec3f operator = (const MsVector3 a)
 		{
 			x = a.x; y = a.y; z = a.z; return *this;
 		}
 
-		inline vec3f operator / (const vec3f a) const
+		inline MsVec3f operator = (const MsVec3f a)
 		{
-			return vec3f(x / a.x, y / a.y, z / a.z);
+			x = a.x; y = a.y; z = a.z; return *this;
 		}
 
-		inline vec3f operator - (const vec3f& a) const
+		inline MsVec3f operator / (const MsVec3f a) const
 		{
-			return vec3f(x - a.x, y - a.y, z - a.z);
+			return MsVec3f(x / a.x, y / a.y, z / a.z);
 		}
 
-		inline vec3f operator / (const double a) const
+		inline MsVec3f operator - (const MsVec3f& a) const
 		{
-			return vec3f(x / a, y / a, z / a);
+			return MsVec3f(x - a.x, y - a.y, z - a.z);
 		}
 
-		inline double dot(const vec3f& a) const
+		inline MsVec3f operator / (const double a) const
+		{
+			return MsVec3f(x / a, y / a, z / a);
+		}
+
+		inline double dot(const MsVec3f& a) const
 		{
 			return a.x*x + a.y*y + a.z*z;
 		}
 
-		inline vec3f cross(const vec3f& a, const vec3f& b)
+		inline MsVec3f cross(const MsVec3f& a, const MsVec3f& b)
 		{
 			x = a.y * b.z - a.z * b.y;
 			y = a.z * b.x - a.x * b.z;
@@ -116,9 +116,9 @@ namespace MeshSimplifierSpace
 			return *this;
 		}
 
-		inline double angle(const vec3f& v)
+		inline double angle(const MsVec3f& v)
 		{
-			vec3f a = v, b = *this;
+			MsVec3f a = v, b = *this;
 			double dot = v.x*x + v.y*y + v.z*z;
 			double len = a.length() * b.length();
 			if (len == 0)len = 0.00001f;
@@ -128,14 +128,14 @@ namespace MeshSimplifierSpace
 			return (double)acos(input);
 		}
 
-		inline double angle2(const vec3f& v, const vec3f& w)
+		inline double angle2(const MsVec3f& v, const MsVec3f& w)
 		{
-			vec3f a = v, b = *this;
+			MsVec3f a = v, b = *this;
 			double dot = a.x*b.x + a.y*b.y + a.z*b.z;
 			double len = a.length() * b.length();
 			if (len == 0)len = 1;
 
-			vec3f plane; plane.cross(b, w);
+			MsVec3f plane; plane.cross(b, w);
 
 			if (plane.x * a.x + plane.y * a.y + plane.z * a.z > 0)
 				return (double)-acos(dot / len);
@@ -143,14 +143,14 @@ namespace MeshSimplifierSpace
 			return (double)acos(dot / len);
 		}
 
-		inline vec3f rot_x(double a)
+		inline MsVec3f rot_x(double a)
 		{
 			double yy = cos(a) * y + sin(a) * z;
 			double zz = cos(a) * z - sin(a) * y;
 			y = yy; z = zz;
 			return *this;
 		}
-		inline vec3f rot_y(double a)
+		inline MsVec3f rot_y(double a)
 		{
 			double xx = cos(-a) * x + sin(-a) * z;
 			double zz = cos(-a) * z - sin(-a) * x;
@@ -166,29 +166,29 @@ namespace MeshSimplifierSpace
 			if (y > max) y = max;
 			if (z > max) z = max;
 		}
-		inline vec3f rot_z(double a)
+		inline MsVec3f rot_z(double a)
 		{
 			double yy = cos(a) * y + sin(a) * x;
 			double xx = cos(a) * x - sin(a) * y;
 			y = yy; x = xx;
 			return *this;
 		}
-		inline vec3f invert()
+		inline MsVec3f invert()
 		{
 			x = -x; y = -y; z = -z; return *this;
 		}
-		inline vec3f frac()
+		inline MsVec3f frac()
 		{
-			return vec3f(
+			return MsVec3f(
 				x - double(int(x)),
 				y - double(int(y)),
 				z - double(int(z))
 			);
 		}
 
-		inline vec3f integer()
+		inline MsVec3f integer()
 		{
-			return vec3f(
+			return MsVec3f(
 				double(int(x)),
 				double(int(y)),
 				double(int(z))
@@ -200,18 +200,13 @@ namespace MeshSimplifierSpace
 			return (double)sqrtf(x*x + y * y + z * z);
 		}
 
-		inline vec3f normalize(double desired_length = 1)
+		inline MsVec3f normalize(double desired_length = 1)
 		{
 			double square = sqrtf(x*x + y * y + z * z);
 			x /= square; y /= square; z /= square;
 
 			return *this;
 		}
-
-		//static vec3f normalize(vec3f a);
-		//static void random_init();
-		//static double random_float();
-		//static vec3f random();
 
 		static int random_number;
 
@@ -222,7 +217,7 @@ namespace MeshSimplifierSpace
 			return double(rni) / (100000.0f - 1.0f);
 		}
 
-		vec3f random01_fxyz()
+		MsVec3f random01_fxyz()
 		{
 			x = (double)random_float_01(x);
 			y = (double)random_float_01(y);
@@ -301,13 +296,13 @@ namespace MeshSimplifierSpace
 		int v[3];
 		double err[4];
 		int deleted, dirty, attr;
-		vec3f n;
-		vec3f uvs[3];
+		MsVec3f n;
+		MsVec3f uvs[3];
 		int material;
 	};
 	struct Vertex
 	{
-		vec3f p;
+		MsVec3f p;
 		int tstart, tcount;
 		SymetricMatrix q;
 		int border;
@@ -332,24 +327,24 @@ namespace MeshSimplifierSpace
 		~MeshSimplifier() {}
 
 	public:
-		static vec3f barycentric(const vec3f &p, const vec3f &a, const vec3f &b, const vec3f &c);
-		static vec3f interpolate(const vec3f &p, const vec3f &a, const vec3f &b, const vec3f &c, const vec3f attrs[3]);
+		static MsVec3f Barycentric(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c);
+		static MsVec3f Interpolate(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c, const MsVec3f attrs[3]);
 
 	protected:
 		// Error between vertex and Quadric
-		double vertex_error(SymetricMatrix q, double x, double y, double z);
+		double VertexError(SymetricMatrix q, double x, double y, double z);
 		// Error for one edge
-		double calculate_error(int id_v1, int id_v2, vec3f &p_result);
+		double CalculateError(int id_v1, int id_v2, MsVec3f &p_result);
 		// Check if a triangle flips when this edge is removed
-		bool flipped(vec3f p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted);
+		bool Flipped(MsVec3f p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted);
 		// Update uvs
-		void update_uvs(int i0, const Vertex &v, const vec3f &p, std::vector<int> &deleted);
+		void UpdateUVs(int i0, const Vertex &v, const MsVec3f &p, std::vector<int> &deleted);
 		// Update triangle connections and edge error after a edge is collapsed
-		void update_triangles(int i0, Vertex &v, std::vector<int> &deleted, int &deleted_triangles);
+		void UpdateTriangles(int i0, Vertex &v, std::vector<int> &deleted, int &deleted_triangles);
 		// Compact triangles, compute edge error and build reference list
-		void update_mesh(int iteration);
+		void UpdateMesh(int iteration);
 		// Finally compact mesh before exiting
-		void compact_mesh();
+		void CompactMesh();
 
 	public:
 		//
@@ -360,9 +355,9 @@ namespace MeshSimplifierSpace
 		//                 5..8 are good numbers
 		//                 more iterations yield higher quality
 		//
-		void simplify_mesh(int target_count, double agressiveness = 7, bool verbose = false);
+		void SimplifyMesh(int target_count, double agressiveness = 7, bool verbose = false);
 
-		void simplify_mesh_lossless(bool verbose = false);
+		void SimplifyMeshLossless(bool verbose = false);
 	};
 
 } // end mesh simplifier

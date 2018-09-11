@@ -3,11 +3,11 @@
 namespace MeshSimplifierSpace
 {
 	// MeshSimplifier  begin
-	vec3f MeshSimplifier::barycentric(const vec3f &p, const vec3f &a, const vec3f &b, const vec3f &c)
+	MsVec3f MeshSimplifier::Barycentric(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c)
 	{
-		vec3f v0 = b - a;
-		vec3f v1 = c - a;
-		vec3f v2 = p - a;
+		MsVec3f v0 = b - a;
+		MsVec3f v1 = c - a;
+		MsVec3f v2 = p - a;
 		double d00 = v0.dot(v0);
 		double d01 = v0.dot(v1);
 		double d11 = v1.dot(v1);
@@ -17,26 +17,26 @@ namespace MeshSimplifierSpace
 		double v = (d11 * d20 - d01 * d21) / denom;
 		double w = (d00 * d21 - d01 * d20) / denom;
 		double u = 1.0 - v - w;
-		return vec3f(u, v, w);
+		return MsVec3f(u, v, w);
 	}
 
-	vec3f MeshSimplifier::interpolate(const vec3f &p, const vec3f &a, const vec3f &b, const vec3f &c, const vec3f attrs[3])
+	MsVec3f MeshSimplifier::Interpolate(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c, const MsVec3f attrs[3])
 	{
-		vec3f bary = barycentric(p, a, b, c);
-		vec3f out = vec3f(0, 0, 0);
+		MsVec3f bary = Barycentric(p, a, b, c);
+		MsVec3f out = MsVec3f(0, 0, 0);
 		out = out + attrs[0] * bary.x;
 		out = out + attrs[1] * bary.y;
 		out = out + attrs[2] * bary.z;
 		return out;
 	}
 
-	double MeshSimplifier::vertex_error(SymetricMatrix q, double x, double y, double z)
+	double MeshSimplifier::VertexError(SymetricMatrix q, double x, double y, double z)
 	{
 		return q[0] * x*x + 2 * q[1] * x*y + 2 * q[2] * x*z + 2 * q[3] * x + q[4] * y*y
 			+ 2 * q[5] * y*z + 2 * q[6] * y + q[7] * z*z + 2 * q[8] * z + q[9];
 	}
 
-	double MeshSimplifier::calculate_error(int id_v1, int id_v2, vec3f &p_result)
+	double MeshSimplifier::CalculateError(int id_v1, int id_v2, MsVec3f &p_result)
 	{
 		// compute interpolated vertex
 		SymetricMatrix q = vertices[id_v1].q + vertices[id_v2].q;
@@ -50,17 +50,17 @@ namespace MeshSimplifierSpace
 			p_result.y = 1 / det * (q.det(0, 2, 3, 1, 5, 6, 2, 7, 8));	// vy = A42/det(q_delta)
 			p_result.z = -1 / det * (q.det(0, 1, 3, 1, 4, 6, 2, 5, 8));	// vz = A43/det(q_delta)
 
-			error = vertex_error(q, p_result.x, p_result.y, p_result.z);
+			error = VertexError(q, p_result.x, p_result.y, p_result.z);
 		}
 		else
 		{
 			// det = 0 -> try to find best result
-			vec3f p1 = vertices[id_v1].p;
-			vec3f p2 = vertices[id_v2].p;
-			vec3f p3 = (p1 + p2) / 2;
-			double error1 = vertex_error(q, p1.x, p1.y, p1.z);
-			double error2 = vertex_error(q, p2.x, p2.y, p2.z);
-			double error3 = vertex_error(q, p3.x, p3.y, p3.z);
+			MsVec3f p1 = vertices[id_v1].p;
+			MsVec3f p2 = vertices[id_v2].p;
+			MsVec3f p3 = (p1 + p2) / 2;
+			double error1 = VertexError(q, p1.x, p1.y, p1.z);
+			double error2 = VertexError(q, p2.x, p2.y, p2.z);
+			double error3 = VertexError(q, p3.x, p3.y, p3.z);
 			error = fmin(error1, fmin(error2, error3));
 			if (error1 == error) p_result = p1;
 			if (error2 == error) p_result = p2;
@@ -69,7 +69,7 @@ namespace MeshSimplifierSpace
 		return error;
 	}
 
-	bool MeshSimplifier::flipped(vec3f p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted)
+	bool MeshSimplifier::Flipped(MsVec3f p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted)
 	{
 		LOOP(k, 0, v0.tcount)
 		{
@@ -85,10 +85,10 @@ namespace MeshSimplifierSpace
 				deleted[k] = 1;
 				continue;
 			}
-			vec3f d1 = vertices[id1].p - p; d1.normalize();
-			vec3f d2 = vertices[id2].p - p; d2.normalize();
+			MsVec3f d1 = vertices[id1].p - p; d1.normalize();
+			MsVec3f d2 = vertices[id2].p - p; d2.normalize();
 			if (fabs(d1.dot(d2)) > 0.999f) return true;
-			vec3f n;
+			MsVec3f n;
 			n.cross(d1, d2);
 			n.normalize();
 			deleted[k] = 0;
@@ -97,7 +97,7 @@ namespace MeshSimplifierSpace
 		return false;
 	}
 
-	void MeshSimplifier::update_uvs(int i0, const Vertex &v, const vec3f &p, std::vector<int> &deleted)
+	void MeshSimplifier::UpdateUVs(int i0, const Vertex &v, const MsVec3f &p, std::vector<int> &deleted)
 	{
 		LOOP(k, 0, v.tcount)
 		{
@@ -105,16 +105,16 @@ namespace MeshSimplifierSpace
 			Triangle &t = triangles[r.tid];
 			if (t.deleted)continue;
 			if (deleted[k])continue;
-			vec3f p1 = vertices[t.v[0]].p;
-			vec3f p2 = vertices[t.v[1]].p;
-			vec3f p3 = vertices[t.v[2]].p;
-			t.uvs[r.tvertex] = interpolate(p, p1, p2, p3, t.uvs);
+			MsVec3f p1 = vertices[t.v[0]].p;
+			MsVec3f p2 = vertices[t.v[1]].p;
+			MsVec3f p3 = vertices[t.v[2]].p;
+			t.uvs[r.tvertex] = Interpolate(p, p1, p2, p3, t.uvs);
 		}
 	}
 
-	void MeshSimplifier::update_triangles(int i0, Vertex &v, std::vector<int> &deleted, int &deleted_triangles)
+	void MeshSimplifier::UpdateTriangles(int i0, Vertex &v, std::vector<int> &deleted, int &deleted_triangles)
 	{
-		vec3f p;
+		MsVec3f p;
 		LOOP(k, 0, v.tcount)
 		{
 			Ref &r = refs[v.tstart + k];
@@ -128,15 +128,15 @@ namespace MeshSimplifierSpace
 			}
 			t.v[r.tvertex] = i0;
 			t.dirty = 1;
-			t.err[0] = calculate_error(t.v[0], t.v[1], p);
-			t.err[1] = calculate_error(t.v[1], t.v[2], p);
-			t.err[2] = calculate_error(t.v[2], t.v[0], p);
+			t.err[0] = CalculateError(t.v[0], t.v[1], p);
+			t.err[1] = CalculateError(t.v[1], t.v[2], p);
+			t.err[2] = CalculateError(t.v[2], t.v[0], p);
 			t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
 			refs.push_back(r);
 		}
 	}
 
-	void MeshSimplifier::update_mesh(int iteration)
+	void MeshSimplifier::UpdateMesh(int iteration)
 	{
 		if (iteration > 0) // compact triangles
 		{
@@ -163,7 +163,7 @@ namespace MeshSimplifierSpace
 			LOOP(i, 0, triangles.size())
 			{
 				Triangle &t = triangles[i];
-				vec3f n, p[3];
+				MsVec3f n, p[3];
 				LOOP(j, 0, 3) p[j] = vertices[t.v[j]].p;
 				n.cross(p[1] - p[0], p[2] - p[0]);
 				n.normalize();
@@ -174,8 +174,8 @@ namespace MeshSimplifierSpace
 			LOOP(i, 0, triangles.size())
 			{
 				// Calc Edge Error
-				Triangle &t = triangles[i]; vec3f p;
-				LOOP(j, 0, 3) t.err[j] = calculate_error(t.v[j], t.v[(j + 1) % 3], p);
+				Triangle &t = triangles[i]; MsVec3f p;
+				LOOP(j, 0, 3) t.err[j] = CalculateError(t.v[j], t.v[(j + 1) % 3], p);
 				t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
 			}
 		}
@@ -254,7 +254,7 @@ namespace MeshSimplifierSpace
 		}
 	}
 
-	void MeshSimplifier::compact_mesh()
+	void MeshSimplifier::CompactMesh()
 	{
 		int dst = 0;
 		LOOP(i, 0, vertices.size())
@@ -285,7 +285,7 @@ namespace MeshSimplifierSpace
 		vertices.resize(dst);
 	}
 
-	void MeshSimplifier::simplify_mesh(int target_count, double agressiveness/* = 7*/, bool verbose/* = false*/)
+	void MeshSimplifier::SimplifyMesh(int target_count, double agressiveness/* = 7*/, bool verbose/* = false*/)
 	{
 		// init
 		LOOP(i, 0, triangles.size())
@@ -306,7 +306,7 @@ namespace MeshSimplifierSpace
 			// update mesh once in a while
 			if (iteration % 5 == 0)
 			{
-				update_mesh(iteration);
+				UpdateMesh(iteration);
 			}
 
 			// clear dirty flag
@@ -343,19 +343,19 @@ namespace MeshSimplifierSpace
 					if (v0.border != v1.border)  continue;
 
 					// Compute vertex to collapse to
-					vec3f p;
-					calculate_error(i0, i1, p);
+					MsVec3f p;
+					CalculateError(i0, i1, p);
 					deleted0.resize(v0.tcount); // normals temporarily
 					deleted1.resize(v1.tcount); // normals temporarily
 					// dont remove if flipped
-					if (flipped(p, i0, i1, v0, v1, deleted0)) continue;
+					if (Flipped(p, i0, i1, v0, v1, deleted0)) continue;
 
-					if (flipped(p, i1, i0, v1, v0, deleted1)) continue;
+					if (Flipped(p, i1, i0, v1, v0, deleted1)) continue;
 
 					if ((t.attr & TEXCOORD) == TEXCOORD)
 					{
-						update_uvs(i0, v0, p, deleted0);
-						update_uvs(i0, v1, p, deleted1);
+						UpdateUVs(i0, v0, p, deleted0);
+						UpdateUVs(i0, v1, p, deleted1);
 					}
 
 					// not flipped, so remove edge
@@ -363,8 +363,8 @@ namespace MeshSimplifierSpace
 					v0.q = v1.q + v0.q;
 					int tstart = refs.size();
 
-					update_triangles(i0, v0, deleted0, deleted_triangles);
-					update_triangles(i0, v1, deleted1, deleted_triangles);
+					UpdateTriangles(i0, v0, deleted0, deleted_triangles);
+					UpdateTriangles(i0, v1, deleted1, deleted_triangles);
 
 					int tcount = refs.size() - tstart;
 
@@ -385,10 +385,10 @@ namespace MeshSimplifierSpace
 			}
 		}
 		// clean up mesh
-		compact_mesh();
+		CompactMesh();
 	}
 
-	void MeshSimplifier::simplify_mesh_lossless(bool verbose /*= false*/)
+	void MeshSimplifier::SimplifyMeshLossless(bool verbose /*= false*/)
 	{
 		// init
 		LOOP(i, 0, triangles.size()) triangles[i].deleted = 0;
@@ -402,7 +402,7 @@ namespace MeshSimplifierSpace
 		for (int iteration = 0; iteration < 9999; iteration++)
 		{
 			// update mesh constantly
-			update_mesh(iteration);
+			UpdateMesh(iteration);
 			// clear dirty flag
 			LOOP(i, 0, triangles.size()) triangles[i].dirty = 0;
 			//
@@ -433,20 +433,20 @@ namespace MeshSimplifierSpace
 					if (v0.border != v1.border)  continue;
 
 					// Compute vertex to collapse to
-					vec3f p;
-					calculate_error(i0, i1, p);
+					MsVec3f p;
+					CalculateError(i0, i1, p);
 
 					deleted0.resize(v0.tcount); // normals temporarily
 					deleted1.resize(v1.tcount); // normals temporarily
 
 					// dont remove if flipped
-					if (flipped(p, i0, i1, v0, v1, deleted0)) continue;
-					if (flipped(p, i1, i0, v1, v0, deleted1)) continue;
+					if (Flipped(p, i0, i1, v0, v1, deleted0)) continue;
+					if (Flipped(p, i1, i0, v1, v0, deleted1)) continue;
 
 					if ((t.attr & TEXCOORD) == TEXCOORD)
 					{
-						update_uvs(i0, v0, p, deleted0);
-						update_uvs(i0, v1, p, deleted1);
+						UpdateUVs(i0, v0, p, deleted0);
+						UpdateUVs(i0, v1, p, deleted1);
 					}
 
 					// not flipped, so remove edge
@@ -454,8 +454,8 @@ namespace MeshSimplifierSpace
 					v0.q = v1.q + v0.q;
 					int tstart = refs.size();
 
-					update_triangles(i0, v0, deleted0, deleted_triangles);
-					update_triangles(i0, v1, deleted1, deleted_triangles);
+					UpdateTriangles(i0, v0, deleted0, deleted_triangles);
+					UpdateTriangles(i0, v1, deleted1, deleted_triangles);
 
 					int tcount = refs.size() - tstart;
 
@@ -476,7 +476,7 @@ namespace MeshSimplifierSpace
 			deleted_triangles = 0;
 		} //for each iteration
 		// clean up mesh
-		compact_mesh();
+		CompactMesh();
 	}
 
 	// MeshSimplifier  end
