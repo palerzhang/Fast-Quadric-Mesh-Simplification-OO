@@ -479,5 +479,63 @@ namespace MeshSimplifierSpace
 		CompactMesh();
 	}
 
+	void MeshSimplifier::OptimizeVertices()
+	{
+		// first interation, set the duplicate_idx
+		int size = vertices.size();
+		std::vector<int> duplicates(size, -1);
+		std::vector<int> finals(size, -1);
+
+		int fi = 0;
+		for (int i = 0; i < size; i++)
+		{
+			if (duplicates[i] < 0)
+			{
+				duplicates[i] = i;
+				// search the rest for the same vertex
+				for (int j = i + 1; j < size; j++)
+				{
+					if (vertices[j].p == vertices[i].p)
+					{
+						duplicates[j] = i;
+					}
+				}
+				finals[i] = fi;
+				fi++;
+			}
+		}
+
+		// make a copy, may cost memory
+		std::vector<Vertex> copy(0);
+		for (int i = 0; i < size; i++)
+		{
+			if (duplicates[i] == i)
+			{
+				copy.emplace_back();
+				auto & vert = copy.back();
+				vert.p = vertices[i].p; // other members are no need to copy
+			}
+		}
+
+		// then update index in triangle
+		size = triangles.size();
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				int ol = triangles[i].v[j];
+				int ne = finals[duplicates[ol]];
+				triangles[i].v[j] = ne;
+			}
+		}
+
+		// finally, replace vertex vector
+		size = copy.size();
+		vertices.resize(size);
+		for (int i = 0; i < size; i++)
+		{
+			vertices[i].p = copy[i].p;
+		}
+	}
 	// MeshSimplifier  end
 }

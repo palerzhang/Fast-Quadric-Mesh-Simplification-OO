@@ -16,7 +16,6 @@
 /////////////////////////////////////////////
 // This project is an OOP version of Fast-Quadric-Mesh-Simplification
 // 
-// License : MIT
 // https://github.com/palerzhang/Fast-Quadric-Mesh-Simplification-OO
 //
 /////////////////////////////////////////////
@@ -24,7 +23,6 @@
 #include <math.h>
 #include <vector>
 #include <string>
-
 
 namespace MeshSimplifierSpace
 {
@@ -91,6 +89,11 @@ namespace MeshSimplifierSpace
 		inline MsVec3f operator / (const MsVec3f a) const
 		{
 			return MsVec3f(x / a.x, y / a.y, z / a.z);
+		}
+
+		inline bool operator == (const MsVec3f a) const
+		{
+			return (x == a.x && y == a.y && z == a.z);
 		}
 
 		inline MsVec3f operator - (const MsVec3f& a) const
@@ -324,7 +327,6 @@ namespace MeshSimplifierSpace
 
 	public:
 		MeshSimplifier() {}
-		~MeshSimplifier() {}
 
 	public:
 		static MsVec3f Barycentric(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c);
@@ -347,6 +349,8 @@ namespace MeshSimplifierSpace
 		void CompactMesh();
 
 	public:
+
+		void OptimizeVertices();
 		//
 		// Main simplification function
 		//
@@ -356,7 +360,7 @@ namespace MeshSimplifierSpace
 		//                 more iterations yield higher quality
 		//
 		void SimplifyMesh(int target_count, double agressiveness = 7, bool verbose = false);
-
+		// Lossless mode
 		void SimplifyMeshLossless(bool verbose = false);
 	};
 
