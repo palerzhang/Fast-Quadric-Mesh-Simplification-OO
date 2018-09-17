@@ -117,10 +117,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="MeshSimplifier.h" />
+    <ClInclude Include="MeshSimplifierPlus.h" />
+    <ClInclude Include="SymetricMatrix.hpp" />
+    <ClInclude Include="Vector3.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshSimplifier.cpp" />
+    <ClCompile Include="MeshSimplifierPlus.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

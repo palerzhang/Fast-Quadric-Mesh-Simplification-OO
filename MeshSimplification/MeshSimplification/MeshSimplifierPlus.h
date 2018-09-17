@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 /////////////////////////////////////////////
 // Original project license
 /////////////////////////////////////////////
@@ -19,6 +20,12 @@
 // https://github.com/palerzhang/Fast-Quadric-Mesh-Simplification-OO
 //
 /////////////////////////////////////////////
+//
+// This is the plus edition of Fast-Quadric-Mesh-Simplification-OO,
+// under namespace MeshSimplifierPlusSpace
+// It supports multiple attributs vertices such as uv and normal
+// 
+/////////////////////////////////////////////
 
 #include <math.h>
 #include <vector>
@@ -29,11 +36,11 @@
 
 using namespace MeshSimplifierMath;
 
-namespace MeshSimplifierSpace
+namespace MeshSimplifierPlusSpace
 {
 	enum Attributes
 	{
-		NONE,
+		POSITION,
 		NORMAL = 2,
 		TEXCOORD = 4,
 		COLOR = 8
@@ -42,18 +49,19 @@ namespace MeshSimplifierSpace
 	{
 		int v[3];
 		double err[4];
-		int deleted, dirty, attr;
-		MsVec3f n;
-		MsVec3f uvs[3];
+		int deleted, dirty;
+		//MsVec3f n;
+		//std::vector<MsVec3f> ns; // same size as  num_fields
+		MsVec3f ns[3];
+		//MsVec3f uvs[3];
 		int material;
 	};
 	struct Vertex
 	{
-		MsVec3f p; // position
-		//MsVec3f uv; // uv, use vector3 for easily handling even just use x,y
-		//MsVec3f n; // normal
+		std::vector<MsVec3f> attrs;
+		SymetricMatrix qs[3];
 		int tstart, tcount;
-		SymetricMatrix q; // position quadric
+		//SymetricMatrix q; // position quadric
 		//SymetricMatrix qu; // uv quadric
 		//SymetricMatrix qn; // normal quadric
 
@@ -75,18 +83,22 @@ namespace MeshSimplifierSpace
 		std::string mtllib;
 		std::vector<std::string> materials;
 
+		int attribute_fields;
+		int num_fields;
+		std::vector<float> coefs;
+
 	public:
 		MeshSimplifier() {}
 
 	public:
 		static MsVec3f Barycentric(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c);
 		static MsVec3f Interpolate(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c, const MsVec3f attrs[3]);
-
+		
 	protected:
 		// Error between vertex and Quadric
 		double VertexError(const SymetricMatrix & q, double x, double y, double z);
 		// Error for one edge
-		double CalculateError(int id_v1, int id_v2, MsVec3f &p_result);
+		double CalculateError(int id_v1, int id_v2, MsVec3f *p_result);
 		// Check if a triangle flips when this edge is removed
 		bool Flipped(const MsVec3f & p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted);
 		// Update uvs

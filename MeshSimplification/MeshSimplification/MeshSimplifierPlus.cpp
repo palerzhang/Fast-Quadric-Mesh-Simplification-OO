@@ -1,8 +1,14 @@
-#include "MeshSimplifier.h"
+#include "MeshSimplifierPlus.h"
 
-namespace MeshSimplifierSpace
+namespace MeshSimplifierPlusSpace
 {
 	// MeshSimplifier  begin
+	MeshSimplifier::MeshSimplifier()
+		: attribute_fields(POSITION)
+		, num_fields(1)
+	{
+	}
+
 	MsVec3f MeshSimplifier::Barycentric(const MsVec3f &p, const MsVec3f &a, const MsVec3f &b, const MsVec3f &c)
 	{
 		MsVec3f v0 = b - a;
@@ -36,13 +42,15 @@ namespace MeshSimplifierSpace
 			+ 2 * q[5] * y*z + 2 * q[6] * y + q[7] * z*z + 2 * q[8] * z + q[9];
 	}
 
-	double MeshSimplifier::CalculateError(int id_v1, int id_v2, MsVec3f &p_result)
+	double MeshSimplifier::CalculateError(int id_v1, int id_v2, MsVec3f *p_result)
 	{
 		// compute interpolated vertex
-		SymetricMatrix q = vertices[id_v1].q + vertices[id_v2].q;
+		SymetricMatrix q[3];
+		for (int i = 0; i < 3; i++)
+			q[i] = vertices[id_v1].qs[i] + vertices[id_v2].qs[i];
 		bool   border = vertices[id_v1].border & vertices[id_v2].border;
 		double error = 0;
-		double det = q.det(0, 1, 2, 1, 4, 5, 2, 5, 7);
+		double det = q[0].det() * q[1].det() * q[2].det();
 		if (det != 0 && !border)
 		{
 			// q_delta is invertible
@@ -159,16 +167,23 @@ namespace MeshSimplifierSpace
 		if (iteration == 0)
 		{
 			LOOP(i, 0, vertices.size())
-				vertices[i].q = SymetricMatrix(0.0);
+			{
+				LOOP(j, 0, num_fields)
+				{
+					vertices[i].qs[j] = SymetricMatrix(0.0);
+				}
+			}
 
 			LOOP(i, 0, triangles.size())
 			{
 				Triangle &t = triangles[i];
-				MsVec3f n, p[3];
-				LOOP(j, 0, 3) p[j] = vertices[t.v[j]].p;
-				n.cross(p[1] - p[0], p[2] - p[0]);
-				n.normalize();
-				t.n = n;
+				LOOP(j, 0, num_fields)
+				{
+					t.ns[j] = t.ns[j]
+						.cross(vertices[t.v[1]].attrs[j] - vertices[t.v[0]].attrs[j],
+							vertices[t.v[2]].attrs[j] - vertices[t.v[0]].attrs[j])
+						.normalize();
+				}
 				LOOP(j, 0, 3) vertices[t.v[j]].q =
 					vertices[t.v[j]].q + SymetricMatrix(n.x, n.y, n.z, -n.dot(p[0]));
 			}

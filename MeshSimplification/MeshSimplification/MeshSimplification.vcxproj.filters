@@ -18,12 +18,24 @@
     <ClInclude Include="MeshSimplifier.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SymetricMatrix.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshSimplifierPlus.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MeshSimplifier.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshSimplifierPlus.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
