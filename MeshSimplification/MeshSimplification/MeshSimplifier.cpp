@@ -30,7 +30,7 @@ namespace MeshSimplifierSpace
 		return out;
 	}
 
-	double MeshSimplifier::VertexError(const SymetricMatrix & q, double x, double y, double z)
+	double MeshSimplifier::VertexError(SymetricMatrix q, double x, double y, double z)
 	{
 		return q[0] * x*x + 2 * q[1] * x*y + 2 * q[2] * x*z + 2 * q[3] * x + q[4] * y*y
 			+ 2 * q[5] * y*z + 2 * q[6] * y + q[7] * z*z + 2 * q[8] * z + q[9];
@@ -69,7 +69,7 @@ namespace MeshSimplifierSpace
 		return error;
 	}
 
-	bool MeshSimplifier::Flipped(const MsVec3f & p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted)
+	bool MeshSimplifier::Flipped(MsVec3f p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted)
 	{
 		LOOP(k, 0, v0.tcount)
 		{
@@ -108,7 +108,6 @@ namespace MeshSimplifierSpace
 			MsVec3f p1 = vertices[t.v[0]].p;
 			MsVec3f p2 = vertices[t.v[1]].p;
 			MsVec3f p3 = vertices[t.v[2]].p;
-
 			t.uvs[r.tvertex] = Interpolate(p, p1, p2, p3, t.uvs);
 		}
 	}

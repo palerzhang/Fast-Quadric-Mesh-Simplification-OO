@@ -7,7 +7,6 @@
 #include <iostream>
 
 using namespace MeshSimplifierSpace;
-using namespace MeshSimplifierMath;
 
 char *trimwhitespace(char *str)
 {
